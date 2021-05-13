@@ -1,0 +1,37 @@
+{
+  "name": "space-invaders-ui",
+  "version": "1.0.0",
+  "private": true,
+  "description": "This is the project containing the user facing portions of the 21st century 8080 emulator as placed into a Space Invaders console.",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --mode=development --watch",
+    "release": "webpack --mode=development",
+    "publish": "npm run release && dotnet publish -c Release"
+  },
+  "keywords": [
+    "8080",
+    "Space Invaders"
+  ],
+  "author": {
+    "email": "davet.code@gmail.com",
+    "name": "David Tyler",
+    "url": "https://blog.davetcode.com"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "clean-webpack-plugin": "4.0.0-alpha.0",
+    "css-loader": "5.2.4",
+    "html-webpack-plugin": "5.3.1",
+    "mini-css-extract-plugin": "1.5.0",
+    "ts-loader": "9.1.1",
+    "typescript": "4.2.4",
+    "webpack": "5.36.0",
+    "webpack-cli": "4.6.0"
+  },
+  "dependencies": {
+    "@microsoft/signalr": "^5.0.5",
+    "@types/node": "^15.0.0",
+    "bootstrap": "^5.0.0"
+  }
+}

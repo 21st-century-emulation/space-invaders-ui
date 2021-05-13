@@ -1,0 +1,629 @@
+version: '3'
+
+networks:
+  space-invaders-ui-dev:
+
+services:
+  memory-bus:
+    image: memory-bus-8080:latest
+    ports:
+      - "8000:8080"
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+
+  spaceinvadersui:
+    image: space-invaders-ui:latest
+    depends_on:
+      - "emulator-backend-8080"
+      - "memory-bus"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"     
+    environment:
+      ApiEndpoints__ReadByteApi: http://memory-bus.:8080/api/v1/readByte
+      ApiEndpoints__ReadWriteApi: http://memory-bus.:8080/api/v1/writeByte
+      ApiEndpoints__ReadRangeApi: http://memory-bus.:8080/api/v1/readRange
+      ApiEndpoints__InitialiseMemoryApi: http://memory-bus.:8080/api/v1/initialise
+      ApiEndpoints__StartProgramApi: http://emulator-backend-8080.:8080/api/v1/start
+      ApiEndpoints__GetStatusApi:  http://emulator-backend-8080.:8080/api/v1/state
+    networks:
+      - space-invaders-ui-dev  
+
+  emulator-backend-8080:
+    image: emulator-backend-8080:latest
+    restart: always
+    depends_on:
+      - "memory-bus"
+    networks:
+      - space-invaders-ui-dev
+    environment:
+      INTERRUPT_SERVICE_URL: http://spaceinvadersui.:8080/api/v1/checkInterrupts
+      INITIALISE_CPU_SERVICE: http://spaceinvadersui.:8080/api/v1/cpu/initialise
+      READ_RANGE_API: http://memory-bus.:8080/api/v1/readRange
+      ACI: http://aci.:8080/api/v1/execute
+      ADC: http://adc.:8080/api/v1/execute
+      ADD: http://add.:8080/api/v1/execute
+      ADI: http://adi.:8080/api/v1/execute
+      ANA: http://ana.:8080/api/v1/execute
+      ANI: http://ani.:8080/api/v1/execute
+      CALL: http://call.:8080/api/v1/execute
+      CMA: http://cma.:8080/api/v1/execute
+      CMC: http://cmc.:8080/api/v1/execute
+      CMP: http://cmp.:8080/api/v1/execute
+      CPI: http://cpi.:8080/api/v1/execute
+      DAA: http://daa.:8080/api/v1/execute
+      DAD: http://dad.:80/api/v1/execute
+      DCR: http://dcr.:8080/api/v1/execute
+      DCX: http://dcx.:8080/api/v1/execute
+      DI: http://di.:8080/api/v1/execute
+      EI: http://ei.:8080/api/v1/execute
+      IN: http://spaceinvadersui.:8080/api/v1/in
+      INR: http://inr.:8080/api/v1/execute
+      INX: http://inx.:8080/api/v1/execute
+      JMP: http://jmp.:8080/api/v1/execute
+      LDA: http://lda.:8080/api/v1/execute
+      LDAX: http://ldax.:8080/api/v1/execute
+      LHLD: http://lhld.:8080/api/v1/execute
+      LXI: http://lxi.:8080/api/v1/execute
+      MOV: http://mov.:8080/api/v1/execute
+      MVI: http://mvi.:8080/api/v1/execute
+      NOOP: http://noop.:8080/api/v1/execute
+      ORA: http://ora.:8080/api/v1/execute
+      ORI: http://ori.:8080/api/v1/execute
+      OUT: http://spaceinvadersui.:8080/api/v1/out
+      PCHL: http://pchl.:8080/api/v1/execute
+      POP: http://pop.:8080/api/v1/execute
+      PUSH: http://push.:8080/api/v1/execute
+      RAL: http://ral.:8080/api/v1/execute
+      RAR: http://rar.:8080/api/v1/execute
+      RET: http://ret.:8080/api/v1/execute
+      RLC: http://rlc.:8080/api/v1/execute
+      RRC: http://rrc.:8080/api/v1/execute
+      RST: http://rst.:8080/api/v1/execute
+      SBB: http://sbb.:8080/api/v1/execute
+      SBI: http://sbi.:8080/api/v1/execute
+      SHLD: http://shld.:8080/api/v1/execute
+      SPHL: http://sphl.:8080/api/v1/execute
+      STA: http://sta.:8080/api/v1/execute
+      STAX: http://stax.:8080/api/v1/execute
+      STC: http://stc.:8080/api/v1/execute
+      SUB: http://sub.:8080/api/v1/execute
+      SUI: http://sui.:8080/api/v1/execute
+      XCHG: http://xchg.:8080/api/v1/execute
+      XRA: http://xra.:8080/api/v1/execute
+      XRI: http://xri.:8080/api/v1/execute
+      XTHL: http://xthl.:8080/api/v1/execute
+
+  aci:
+    image: ghcr.io/21st-century-emulation/aci:latest
+    ports: 
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  adc:
+    image: ghcr.io/21st-century-emulation/adc:latest
+    ports: 
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  add:
+    image: ghcr.io/21st-century-emulation/add:latest
+    ports: 
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  adi:
+    image: ghcr.io/21st-century-emulation/adi:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  ana:
+    image: ghcr.io/21st-century-emulation/ana:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  ani:
+    image: ghcr.io/21st-century-emulation/ani:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  call:
+    image: ghcr.io/21st-century-emulation/call:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  cma:
+    image: ghcr.io/21st-century-emulation/cma:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  cmc:
+    image: ghcr.io/21st-century-emulation/cmc:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  cmp:
+    image: ghcr.io/21st-century-emulation/cmp:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  cpi:
+    image: ghcr.io/21st-century-emulation/cpi:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  daa:
+    image: ghcr.io/21st-century-emulation/daa:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  dad:
+    image: ghcr.io/21st-century-emulation/dad:latest
+    ports:
+      - "80"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  dcr:
+    image: ghcr.io/21st-century-emulation/dcr:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  dcx:
+    image: ghcr.io/21st-century-emulation/dcx:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  di:
+    image: ghcr.io/21st-century-emulation/di:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  ei:
+    image: ghcr.io/21st-century-emulation/ei:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  in:
+    image: ghcr.io/21st-century-emulation/noop:latest # TODO - Implement IN
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  inr:
+    image: ghcr.io/21st-century-emulation/inr:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  inx:
+    image: ghcr.io/21st-century-emulation/inx:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  jmp:
+    image: ghcr.io/21st-century-emulation/jmp:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  lda:
+    image: ghcr.io/21st-century-emulation/lda:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  ldax:
+    image: ghcr.io/21st-century-emulation/ldax:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  lhld:
+    image: ghcr.io/21st-century-emulation/lhld:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  lxi:
+    image: ghcr.io/21st-century-emulation/lxi:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  mov:
+    image: ghcr.io/21st-century-emulation/mov:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  mvi:
+    image: ghcr.io/21st-century-emulation/mvi:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  noop:
+    image: ghcr.io/21st-century-emulation/noop:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  ora:
+    image: ghcr.io/21st-century-emulation/ora:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  ori:
+    image: ghcr.io/21st-century-emulation/ori:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  out:
+    image: ghcr.io/21st-century-emulation/noop:latest  # TODO - Implement OUT
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  pchl:
+    image: ghcr.io/21st-century-emulation/pchl:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  pop:
+    image: ghcr.io/21st-century-emulation/pop:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  push:
+    image: ghcr.io/21st-century-emulation/push:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  ral:
+    image: ghcr.io/21st-century-emulation/ral:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  rar:
+    image: ghcr.io/21st-century-emulation/rar:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  ret:
+    image: ghcr.io/21st-century-emulation/ret:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  rlc:
+    image: ghcr.io/21st-century-emulation/rlc:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  rrc:
+    image: ghcr.io/21st-century-emulation/rrc:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  rst:
+    image: ghcr.io/21st-century-emulation/rst:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  sbb:
+    image: ghcr.io/21st-century-emulation/sbb:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  sbi:
+    image: ghcr.io/21st-century-emulation/sbi:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  shld:
+    image: ghcr.io/21st-century-emulation/shld:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  sphl:
+    image: ghcr.io/21st-century-emulation/sphl:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  sta:
+    image: ghcr.io/21st-century-emulation/sta:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  stax:
+    image: ghcr.io/21st-century-emulation/stax:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  stc:
+    image: ghcr.io/21st-century-emulation/stc:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  sub:
+    image: ghcr.io/21st-century-emulation/sub:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  sui:
+    image: ghcr.io/21st-century-emulation/sui:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  xchg:
+    image: ghcr.io/21st-century-emulation/xchg:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  xra:
+    image: ghcr.io/21st-century-emulation/xra:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  xri:
+    image: ghcr.io/21st-century-emulation/xri:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev
+  xthl:
+    image: ghcr.io/21st-century-emulation/xthl:latest
+    ports:
+      - "8080"
+    environment:
+      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
+      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
+    restart: always
+    networks:
+      - space-invaders-ui-dev

@@ -1,0 +1,18 @@
+#cycles-per-second-container {
+  position:absolute;
+  top: 0;
+  left: 0;
+  background: black;
+  color: white;
+}
+
+.canvas-container {
+  margin-right: auto;
+  margin-left: auto;
+  width: 448px;
+}
+
+.memory-table-container {
+  overflow-y: auto;
+  height: 100%;
+}
