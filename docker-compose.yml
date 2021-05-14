@@ -5,7 +5,7 @@ networks:
 
 services:
   memory-bus:
-    image: memory-bus-8080:latest
+    image: ghcr.io/21st-century-emulation/memory-bus-8080:latest
     ports:
       - "8000:8080"
     restart: always
@@ -33,7 +33,7 @@ services:
       - space-invaders-ui-dev  
 
   emulator-backend-8080:
-    image: emulator-backend-8080:latest
+    image: ghcr.io/21st-century-emulation/emulator-backend-8080:latest
     restart: always
     depends_on:
       - "memory-bus"
@@ -267,16 +267,6 @@ services:
     restart: always
     networks:
       - space-invaders-ui-dev
-  in:
-    image: ghcr.io/21st-century-emulation/noop:latest # TODO - Implement IN
-    ports:
-      - "8080"
-    environment:
-      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
-      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
-    restart: always
-    networks:
-      - space-invaders-ui-dev
   inr:
     image: ghcr.io/21st-century-emulation/inr:latest
     ports:
@@ -389,16 +379,6 @@ services:
       - space-invaders-ui-dev
   ori:
     image: ghcr.io/21st-century-emulation/ori:latest
-    ports:
-      - "8080"
-    environment:
-      WRITE_MEMORY_API: http://memory-bus.:8080/api/v1/writeByte
-      READ_MEMORY_API: http://memory-bus.:8080/api/v1/readByte
-    restart: always
-    networks:
-      - space-invaders-ui-dev
-  out:
-    image: ghcr.io/21st-century-emulation/noop:latest  # TODO - Implement OUT
     ports:
       - "8080"
     environment:
