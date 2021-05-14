@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
-using Serilog.Sinks.Grafana.Loki;
 
 namespace SpaceInvadersUI
 {
@@ -15,17 +14,6 @@ namespace SpaceInvadersUI
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .MinimumLevel.Override("Serilog", LogEventLevel.Warning)
                 .WriteTo.Console();
-
-            var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
-            if (lokiUrl != null)
-            {
-                Console.WriteLine("Found LOKI_URL {0}", lokiUrl);
-                logConfig
-                    .MinimumLevel.Warning()
-                    .WriteTo.GrafanaLoki(lokiUrl, labels: new[] {
-                        new LokiLabel {Key = "application", Value = "space-invaders-ui"},
-                    });
-            }
 
             Log.Logger = logConfig.CreateLogger();
 
