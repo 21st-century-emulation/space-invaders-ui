@@ -63,11 +63,18 @@ connection.on("cpuUpdated", (cpu: Cpu, memoryBase64String: string) => {
     if (timeSinceLastUpdate !== null) {
         const diffMs = updateTime.getTime() - timeSinceLastUpdate.getTime();
         const diffCycles = cpu.state.cycles - cyclesAtLastUpdate;
-        const cyclesPerSecond = (diffCycles * 1000) / diffMs;
-        cyclesPerSecondElement.textContent = `${cyclesPerSecond.toFixed(2)}Hz`;
-    }
-    timeSinceLastUpdate = updateTime;
-    cyclesAtLastUpdate = cpu.state.cycles;
+
+        // If cycles haven't changed don't change the performance counter
+        if (diffCycles !== 0) {
+            const cyclesPerSecond = (diffCycles * 1000) / diffMs;
+            cyclesPerSecondElement.textContent = `${cyclesPerSecond.toFixed(2)}Hz`;
+            timeSinceLastUpdate = updateTime;
+            cyclesAtLastUpdate = cpu.state.cycles;
+        }
+    } else {
+        timeSinceLastUpdate = updateTime;
+        cyclesAtLastUpdate = cpu.state.cycles;
+    }    
 });
 
 connection.on("vblank", (vram: string) => {
